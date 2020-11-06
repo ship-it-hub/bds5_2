@@ -182,10 +182,10 @@ UPDATE vitalii_schema.RateCode
 SET [Name] = CASE ID
                       WHEN 1 THEN 'Standard rate' 
                       WHEN 2 THEN 'JFK' 
-					  WHEN 3 THEN 'Newark' 
-					  WHEN 4 THEN 'Nassau or Westchester' 
-					  WHEN 5 THEN 'Negotiated fare' 
-					  WHEN 6 THEN 'Group ride' 
+		      WHEN 3 THEN 'Newark' 
+		      WHEN 4 THEN 'Nassau or Westchester' 
+		      WHEN 5 THEN 'Negotiated fare' 
+		      WHEN 6 THEN 'Group ride' 
                       ELSE [Name]
                       END
 GO
@@ -212,10 +212,10 @@ UPDATE vitalii_schema.Payment_type
 SET [Name] = CASE ID
                       WHEN 1 THEN 'Credit card' 
                       WHEN 2 THEN 'Cash' 
-					  WHEN 3 THEN 'No charge' 
-					  WHEN 4 THEN 'Dispute' 
-					  WHEN 5 THEN 'Unknown' 
-					  WHEN 6 THEN 'Voided trip' 
+		      WHEN 3 THEN 'No charge' 
+		      WHEN 4 THEN 'Dispute' 
+		      WHEN 5 THEN 'Unknown' 
+		      WHEN 6 THEN 'Voided trip'		  
                       ELSE [Name]
                       END
 GO
