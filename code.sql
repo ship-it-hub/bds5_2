@@ -18,6 +18,8 @@ CREATE USER vitalii
 	WITH DEFAULT_SCHEMA = vitalii_schema
 GO
 
+EXEC sp_addrolemember N'db_owner', N'vitalii'
+GO
 
 
 -- step 5
@@ -117,11 +119,16 @@ CREATE TABLE vitalii_schema.fact_tripdata
 	[congestion_surcharge] [real] NULL
 )
 WITH
-(
-    DISTRIBUTION = HASH (payment_type),
+(   
+    DISTRIBUTION = HASH (tpep_pickup_datetime),
     CLUSTERED COLUMNSTORE INDEX
 )
 GO
+
+INSERT INTO vitalii_schema.fact_tripdata 
+    SELECT *  
+    FROM vitalii_schema.ext_table;  
+GO  
 
 
 
@@ -136,9 +143,21 @@ CREATE TABLE vitalii_schema.Vendor
 )
 WITH
 (
-    DISTRIBUTION = REPLICATE,
-    CLUSTERED COLUMNSTORE INDEX
+	DISTRIBUTION = REPLICATE,
+	CLUSTERED COLUMNSTORE INDEX
 )
+GO
+
+INSERT INTO vitalii_schema.Vendor (ID)
+	SELECT DISTINCT VendorID FROM vitalii_schema.fact_tripdata WHERE VendorID IS NOT NULL; 
+GO  
+
+UPDATE vitalii_schema.Vendor 
+SET [Name] = CASE ID
+                      WHEN 1 THEN 'Creative Mobile Technologies, LLC' 
+                      WHEN 2 THEN 'VeriFone Inc.' 
+                      ELSE [Name]
+                      END
 GO
 
 
@@ -155,6 +174,22 @@ WITH
 )
 GO
 
+INSERT INTO vitalii_schema.RateCode (ID)
+	SELECT DISTINCT RateCodeID FROM vitalii_schema.fact_tripdata WHERE RateCodeID IS NOT NULL; 
+GO  
+
+UPDATE vitalii_schema.RateCode 
+SET [Name] = CASE ID
+                      WHEN 1 THEN 'Standard rate' 
+                      WHEN 2 THEN 'JFK' 
+					  WHEN 3 THEN 'Newark' 
+					  WHEN 4 THEN 'Nassau or Westchester' 
+					  WHEN 5 THEN 'Negotiated fare' 
+					  WHEN 6 THEN 'Group ride' 
+                      ELSE [Name]
+                      END
+GO
+
 
 
 CREATE TABLE vitalii_schema.Payment_type
@@ -167,4 +202,20 @@ WITH
 	DISTRIBUTION = REPLICATE,
 	CLUSTERED COLUMNSTORE INDEX
 )
+GO
+
+INSERT INTO vitalii_schema.Payment_type (ID)
+	SELECT DISTINCT Payment_type FROM vitalii_schema.fact_tripdata WHERE Payment_type IS NOT NULL; 
+GO  
+
+UPDATE vitalii_schema.Payment_type 
+SET [Name] = CASE ID
+                      WHEN 1 THEN 'Credit card' 
+                      WHEN 2 THEN 'Cash' 
+					  WHEN 3 THEN 'No charge' 
+					  WHEN 4 THEN 'Dispute' 
+					  WHEN 5 THEN 'Unknown' 
+					  WHEN 6 THEN 'Voided trip' 
+                      ELSE [Name]
+                      END
 GO
